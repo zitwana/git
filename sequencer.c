@@ -5140,14 +5140,18 @@ int complete_action(struct repository *r, struct replay_opts *opts, unsigned fla
 		return error_errno(_("could not write '%s'"), todo_file);
 	}
 
+	res = -1;
+
 	if (checkout_onto(r, opts, onto_name, &oid, orig_head))
-		return -1;
+		goto cleanup;
 
 	if (require_clean_work_tree(r, "rebase", "", 1, 1))
-		return -1;
+		goto cleanup;
 
 	todo_list_write_total_nr(&new_todo);
 	res = pick_commits(r, &new_todo, opts);
+
+cleanup:
 	todo_list_release(&new_todo);
 
 	return res;
